@@ -1,0 +1,14 @@
+Package: fixedtimeanalyzR
+Type: Package
+Title: Survival analysis at a fixed point in time
+Version: 0.1.1
+Date: 2020-07-09
+Author: Lukas D. Sauer <sauer@imbi.uni-heidelberg.de>
+Maintainer: Lukas D. Sauer <sauer@imbi.uni-heidelberg.de>
+Description: This package implements several methods for comparing survival curves
+    at a fixed point in time. The tests are Chi-Square-Tests that rely on test
+    statistics developed by John P. Klein et al. in their article "Analyzing
+    survival curves at a fixed point in time" published in Statistics in Medicine
+    26 (2007).
+Encoding: UTF-8
+LazyData: true
