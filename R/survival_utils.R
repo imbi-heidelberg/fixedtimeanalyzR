@@ -46,11 +46,11 @@ get_surv_KM <- function(data, t){
 #'
 #' @examples
 #' data(exp_surv)
-#' get_surv_KM(exp_surv, 1)
+#' get_se_KM(exp_surv, 1)
 #'
 #' @export
 get_se_KM <- function(data, t){
-  se_KM = summary(survfit(formula = Surv(time, status) ~ treatment, data=data), times=t, extend = TRUE)$std.err
+  se_KM = summary(survfit(formula = Surv(time, status) ~ group, data=data), times=t, extend = TRUE)$std.err
   return(se_KM)
 }
 
@@ -73,7 +73,7 @@ get_se_KM <- function(data, t){
 #'
 #' @examples
 #' data(exp_surv)
-#' get_surv_KM(exp_surv, 1)
+#' get_sigma_KM(exp_surv, 1)
 #'
 #' @export
 get_sigma_KM <- function(data, t){

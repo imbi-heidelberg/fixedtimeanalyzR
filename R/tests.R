@@ -6,17 +6,12 @@ library(ggfortify)
 library(tidyverse)
 library(magrittr)
 
-# ------------------------------------------------------------------------------
-# DIFFERENT STATISTICS FOR COMPARING SURVIVAL CURVES
 
 
 
 
-# ------------------------------------------------------------------------------
-# Naive statistic
-X1 <- function(surv_KM, se_KM){
-  return( (surv_KM[1]-surv_KM[2])**2/ (se_KM[1]**2 + se_KM[2]**2) )
-}
+
+
 
 X1.test <- function(surv_KM, se_KM, conf.level = 0.95){
   statistic <- X1(surv_KM, se_KM)

@@ -16,11 +16,12 @@
 #'
 #' @examples
 #' library(ggplot2)
+#' library(ggfortify)
 #' library(survival)
 #'
 #' data(exp_surv)
-#' exp_fit <- survfit(Surv(time, status) ~ group, data=exp_surv)
-#' autoplot(exp_fit) + stat_function(fun=function(x){1-pexp(x, log(1/p1))}
+#' exp_fit <- survft(Surv(time, status) ~ group, data=exp_surv)
+#' autoplot(exp_fit)
 #'
 #' \donttest{iplotCurves(phe, times)}
 "exp_surv"
