@@ -12,9 +12,10 @@
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data a dataset that has the variables \code{time} specifying time to
-#' event or time to censoring, \code{status} specifying the censoring status and
-#' \code{group} specifying the different groups to be compared.
+#' @param data either a survfit object or a data frame that has the variables
+#' \code{time} specifying time to event or time to censoring, \code{status}
+#' specifying the censoring status and \code{group} specifying the different
+#' groups to be compared.
 #' @param t the point in time at which the statistic
 #'
 #' @return A numeric scalar containing the value of the test statistic.
@@ -41,9 +42,10 @@ naive.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data a dataset that has the variables \code{time} specifying time to
-#' event or time to censoring, \code{status} specifying the censoring status and
-#' \code{group} specifying the different groups to be compared.
+#' @param data either a survfit object or a data frame that has the variables
+#' \code{time} specifying time to event or time to censoring, \code{status}
+#' specifying the censoring status and \code{group} specifying the different
+#' groups to be compared.
 #' @param t the point in time at which the statistic
 #'
 #' @return A numeric scalar containing the value of the test statistic.
@@ -70,9 +72,10 @@ log.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data a dataset that has the variables \code{time} specifying time to
-#' event or time to censoring, \code{status} specifying the censoring status and
-#' \code{group} specifying the different groups to be compared.
+#' @param data either a survfit object or a data frame that has the variables
+#' \code{time} specifying time to event or time to censoring, \code{status}
+#' specifying the censoring status and \code{group} specifying the different
+#' groups to be compared.
 #' @param t the point in time at which the statistic
 #'
 #' @return A numeric scalar containing the value of the test statistic.
@@ -102,9 +105,10 @@ clog.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data a dataset that has the variables \code{time} specifying time to
-#' event or time to censoring, \code{status} specifying the censoring status and
-#' \code{group} specifying the different groups to be compared.
+#' @param data either a survfit object or a data frame that has the variables
+#' \code{time} specifying time to event or time to censoring, \code{status}
+#' specifying the censoring status and \code{group} specifying the different
+#' groups to be compared.
 #' @param t the point in time at which the statistic
 #'
 #' @return A numeric scalar containing the value of the test statistic.
@@ -135,9 +139,10 @@ asinsqrt.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data a dataset that has the variables \code{time} specifying time to
-#' event or time to censoring, \code{status} specifying the censoring status and
-#' \code{group} specifying the different groups to be compared.
+#' @param data either a survfit object or a data frame that has the variables
+#' \code{time} specifying time to event or time to censoring, \code{status}
+#' specifying the censoring status and \code{group} specifying the different
+#' groups to be compared.
 #' @param t the point in time at which the statistic
 #'
 #' @return A numeric scalar containing the value of the test statistic.
@@ -154,3 +159,4 @@ logit.t <- function(data, t){
   denominator = sigma_KM[1]**2/(1-surv_KM[1])**2 + sigma_KM[2]**2/(1-surv_KM[2])**2
   return(numerator/denominator)
 }
+
