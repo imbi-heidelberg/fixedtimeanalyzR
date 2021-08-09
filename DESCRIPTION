@@ -1,7 +1,7 @@
 Package: fixedtimeanalyzR
 Type: Package
 Title: Survival analysis at a fixed point in time
-Version: 0.1.2
+Version: 0.1.3
 Date: 2020-07-09
 Author: Lukas D. Sauer <sauer@imbi.uni-heidelberg.de>
 Maintainer: Lukas D. Sauer <sauer@imbi.uni-heidelberg.de>

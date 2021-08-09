@@ -12,22 +12,20 @@
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data either a survfit object or a data frame that has the variables
-#' \code{time} specifying time to event or time to censoring, \code{status}
-#' specifying the censoring status and \code{group} specifying the different
-#' groups to be compared.
-#' @param t the point in time at which the statistic
+#' @param surv_KM a numeric vector containing survival rates for two groups
+#' @param se_KM a numeric vector containing standard errors for two groups
 #'
 #' @return A numeric scalar containing the value of the test statistic.
 #'
 #' @examples
 #' data(exp_surv)
-#' naive.t(exp_surv, 1)
+#'
+#' surv_KM = get_surv_KM(exp_surv, 1)
+#' se_KM = get_se_KM(exp_surv, 1)
+#' naive.t(surv_KM, se_KM)
 #'
 #' @export
-naive.t <- function(data, t){
-  surv_KM = get_surv_KM(data, t)
-  se_KM = get_se_KM(data, t)
+naive.t <- function(surv_KM, se_KM){
   return( (surv_KM[1]-surv_KM[2])**2/ (se_KM[1]**2 + se_KM[2]**2) )
 }
 
@@ -42,22 +40,21 @@ naive.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data either a survfit object or a data frame that has the variables
-#' \code{time} specifying time to event or time to censoring, \code{status}
-#' specifying the censoring status and \code{group} specifying the different
-#' groups to be compared.
-#' @param t the point in time at which the statistic
+#' @param surv_KM a numeric vector containing survival rates for two groups
+#' @param se_KM a numeric vector containing standard errors for two groups
 #'
 #' @return A numeric scalar containing the value of the test statistic.
 #'
 #' @examples
 #' data(exp_surv)
-#' log.t(exp_surv, 1)
+#'
+#' surv_KM = get_surv_KM(exp_surv, 1)
+#' se_KM = get_se_KM(exp_surv, 1)
+#' log.t(surv_KM, se_KM)
 #'
 #' @export
-log.t <- function(data, t){
-  surv_KM = get_surv_KM(data, t)
-  sigma_KM = get_sigma_KM(data, t)
+log.t <- function(surv_KM, se_KM){
+  sigma_KM = get_sigma_KM(surv_KM, se_KM)
   return( (log(surv_KM[1])-log(surv_KM[2]))**2/ (sigma_KM[1]**2 + sigma_KM[2]**2) )
 }
 
@@ -72,22 +69,21 @@ log.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data either a survfit object or a data frame that has the variables
-#' \code{time} specifying time to event or time to censoring, \code{status}
-#' specifying the censoring status and \code{group} specifying the different
-#' groups to be compared.
-#' @param t the point in time at which the statistic
+#' @param surv_KM a numeric vector containing survival rates for two groups
+#' @param se_KM a numeric vector containing standard errors for two groups
 #'
 #' @return A numeric scalar containing the value of the test statistic.
 #'
 #' @examples
 #' data(exp_surv)
-#' clog.t(exp_surv, 1)
+#'
+#' surv_KM = get_surv_KM(exp_surv, 1)
+#' se_KM = get_se_KM(exp_surv, 1)
+#' clog.t(surv_KM, se_KM)
 #'
 #' @export
-clog.t <- function(data, t){
-  surv_KM = get_surv_KM(data, t)
-  sigma_KM = get_sigma_KM(data, t)
+clog.t <- function(surv_KM, se_KM){
+  sigma_KM = get_sigma_KM(surv_KM, se_KM)
   # TODO: Warning! Due to the fact that log(1)=0, this statistic can return NaN, in case that surv_KM equals 1.
   numerator = (log(-log(surv_KM[1]))-log(-log(surv_KM[2])))**2
   denominator = ( sigma_KM[1]/log(surv_KM[1]) )**2+( sigma_KM[2]/log(surv_KM[2]) )**2
@@ -105,22 +101,21 @@ clog.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data either a survfit object or a data frame that has the variables
-#' \code{time} specifying time to event or time to censoring, \code{status}
-#' specifying the censoring status and \code{group} specifying the different
-#' groups to be compared.
-#' @param t the point in time at which the statistic
+#' @param surv_KM a numeric vector containing survival rates for two groups
+#' @param se_KM a numeric vector containing standard errors for two groups
 #'
 #' @return A numeric scalar containing the value of the test statistic.
 #'
 #' @examples
 #' data(exp_surv)
-#' asinsqrt.t(exp_surv, 1)
+#'
+#' surv_KM = get_surv_KM(exp_surv, 1)
+#' se_KM = get_se_KM(exp_surv, 1)
+#' asinsqrt.t(surv_KM, se_KM)
 #'
 #' @export
-asinsqrt.t <- function(data, t){
-  surv_KM = get_surv_KM(data, t)
-  sigma_KM = get_sigma_KM(data, t)
+asinsqrt.t <- function(surv_KM, se_KM){
+  sigma_KM = get_sigma_KM(surv_KM, se_KM)
   nu = c(0.0,0.0)
   for(k in (1:2)){
     nu[k] = surv_KM[k]*sigma_KM[k]**2/( 4*(1-surv_KM[k]) )
@@ -139,22 +134,21 @@ asinsqrt.t <- function(data, t){
 #' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
-#' @param data either a survfit object or a data frame that has the variables
-#' \code{time} specifying time to event or time to censoring, \code{status}
-#' specifying the censoring status and \code{group} specifying the different
-#' groups to be compared.
-#' @param t the point in time at which the statistic
+#' @param surv_KM a numeric vector containing survival rates for two groups
+#' @param se_KM a numeric vector containing standard errors for two groups
 #'
 #' @return A numeric scalar containing the value of the test statistic.
 #'
 #' @examples
 #' data(exp_surv)
-#' logit.t(exp_surv, 1)
+#'
+#' surv_KM = get_surv_KM(exp_surv, 1)
+#' se_KM = get_se_KM(exp_surv, 1)
+#' logit.t(surv_KM, se_KM)
 #'
 #' @export
-logit.t <- function(data, t){
-  surv_KM = get_surv_KM(data, t)
-  sigma_KM = get_sigma_KM(data, t)
+logit.t <- function(surv_KM, se_KM){
+  sigma_KM = get_sigma_KM(surv_KM, se_KM)
   numerator = ( log(surv_KM[1]/(1-surv_KM[1])) - log(surv_KM[2]/(1-surv_KM[2])) )**2
   denominator = sigma_KM[1]**2/(1-surv_KM[1])**2 + sigma_KM[2]**2/(1-surv_KM[2])**2
   return(numerator/denominator)

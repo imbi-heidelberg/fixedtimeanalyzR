@@ -1,96 +1,429 @@
-library(survival)
-library(ranger)
-library(ggplot2)
-library(dplyr)
-library(ggfortify)
-library(tidyverse)
-library(magrittr)
+#' Naive test for difference of survival rates.
+#'
+#' This function tests two survival rates at a fixed point in time for equality.
+#' This test can also be used in order to compare the survival rate of a data
+#'  frame to some given numerical value. Therefore, there are three
+#' possibilities for data input, (1) data with two groups and
+#' null variables surv_KM and se_KM, (2) data with one group and two
+#' numeric vectors surv_KM and se_KM of length 1, (3) a null variable data and
+#' two numeric vectors surv_KM and se_KM of length 2. The test uses a naive
+#'  test statistic for comparing the survival rates of two survival curves at a
+#'  fixed point in time. This statistic is an implementation of the
+#' test statistic \eqn{X_1^2}{X1^2} in Klein et al.'s paper [1]. The test is a
+#' chi-squared test with one degree of freedom.
+#'
+#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' Statist. Med., 26: 4505-4519.
+#'
+#' @param data either a null object or a survfit object or a data frame that has
+#' the variables \code{time} specifying time to event or time to censoring,
+#' \code{status} specifying the censoring status and \code{group} specifying the
+#'  different groups to be compared.
+#' @param surv_KM either a null object or a numeric vector containing survival
+#' rates for one or two groups
+#' @param se_KM either a null object or a numeric vector containing standard
+#' errors for one or two groups
+#' @param t the point in time at which the survival rate will be calculated
+#'
+#' @return A numeric vector containing the survival rates for the different
+#' groups at time t.
+#'
+#' @examples
+#' data(exp_surv)
+#' naive.test(exp_surv, t=1)
+#'
+#' library(survival)
+#' exp_fit <- survfit(formula = Surv(time, status) ~ group, data=exp_surv)
+#' naive.test(exp_fit, t=1)
+#'
+#' library(tidyverse)
+#' exp_surv %>% filter(group == 1) -> exp_surv_grp1
+#' naive.test(exp_surv_grp1, surv_KM=0.5, se_KM=0.08, t=1)
+#'
+#' naive.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
+naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Calculation and/or concatenation of survival data
+  surv_KM = get_surv_KM(data, surv_KM, t)
+  se_KM = get_se_KM(data, se_KM, t)
 
 
+  # Construction of the htest results object
+  res <- list()
+  class(res) <- "htest"
+  res$null.value  <- c(0)
+  names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
+  res$alternative <- "greater" # A chi-squared test is always a one-sided test
+  res$method <- "Naive test for equality of survival rates at a fixed point in time.
 
-
-
-
-
-
-X1.test <- function(surv_KM, se_KM, conf.level = 0.95){
-  statistic <- X1(surv_KM, se_KM)
-  result <- statistic > qchisq(conf.level, 1)
-  l = c(statistic, result, "Naive test X1")
-  names(l) <- c("statistic", "result", "method")
-
-  return(l)
-}
-
-#-------------------------------------------------------------------------------
-# log-trafo statistic
-X2 <- function(surv_KM, se_KM){
-  sigma_KM = get_sigma_KM(surv_KM, se_KM)
-  return( (log(surv_KM[1])-log(surv_KM[2]))**2/ (sigma_KM[1]**2 + sigma_KM[2]**2) )
-}
-
-X2.test <- function(surv_KM, se_KM, conf.level = 0.95){
-  statistic <- X2(surv_KM, se_KM)
-  result <- statistic > qchisq(conf.level, 1)
-  l = c(statistic, result, "log-transformed statistic X2")
-  names(l) <- c("statistic", "result", "method")
-
-  return(l)
-}
-
-#-------------------------------------------------------------------------------
-# clog-trafo statistic
-X3 <- function(surv_KM, se_KM){
-  sigma_KM = get_sigma_KM(surv_KM, se_KM)
-  # TODO: Warning! Due to the fact that log(1)=0, this statistic can return NaN, in case that surv_KM equals 1.
-  numerator = (log(-log(surv_KM[1]))-log(-log(surv_KM[2])))**2
-  denominator = ( sigma_KM[1]/log(surv_KM[1]) )**2+( sigma_KM[2]/log(surv_KM[2]) )**2
-  return(numerator/denominator)
-}
-
-X3.test <- function(surv_KM, se_KM, conf.level = 0.95){
-  statistic <- X3(surv_KM, se_KM)
-  result <- statistic > qchisq(conf.level, 1)
-  l = c(statistic, result, "clog-transformed statistic X3")
-  names(l) <- c("statistic", "result", "method")
-
-  return(l)
-}
-
-#-------------------------------------------------------------------------------
-# arcsin-sqrt-trafo statistic
-X4 <- function(surv_KM, se_KM){
-  sigma_KM = get_sigma_KM(surv_KM, se_KM)
-  nu = c(0.0,0.0)
-  for(k in (1:2)){
-    nu[k] = surv_KM[k]*sigma_KM[k]**2/( 4*(1-surv_KM[k]) )
+  This test is using the naive test statistic X1^2 from Klein et al.'s paper
+  'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
+  26 (2007). It is a chi-squared test with one degree of freedom."
+  res$data.name   <- sprintf(deparse(substitute(data)))
+  if(!is.null(t)){
+    res$parameters  <- c(t)
+    names(res$parameters) <- c("time")
   }
-  return( ( asin(sqrt(surv_KM[1]))-asin(sqrt(surv_KM[2])) )**2/ (nu[1]+nu[2]) )
+
+  # Survival rates and their difference
+  diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
+  res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
+  names(res$estimate) <- c("Survival rate of group 1",
+                           "Standard error of group 1",
+                           "Survival rate of group 2",
+                           "Standard error of group 2",
+                           "Absolute difference of rates")
+
+  # Test statistic
+  statistic <- naive.t(surv_KM, se_KM)
+  res$statistic <- statistic
+  names(res$statistic) <- "naive statistic X1^2"
+
+  # p-value, probability of naive.t < t
+  res$p.value <- 1 - pchisq(statistic, df = 1)
+  return(res)
 }
 
-X4.test <- function(surv_KM, se_KM, conf.level = 0.95){
-  statistic <- X4(surv_KM, se_KM)
-  result <- statistic > qchisq(conf.level, 1)
-  l = c(statistic, result, "arcsine-square-root-transformed statistic X4")
-  names(l) <- c("statistic", "result", "method")
+#' Log-transformed test for difference of survival rates.
+#'
+#' This function tests two survival rates at a fixed point in time for equality.
+#' This test can also be used in order to compare the survival rate of a data
+#'  frame to some given numerical value. Therefore, there are three
+#' possibilities for data input, (1) data with two groups and
+#' null variables surv_KM and se_KM, (2) data with one group and two
+#' numeric vectors surv_KM and se_KM of length 1, (3) a null variable data and
+#' two numeric vectors surv_KM and se_KM of length 2. The test uses a log-transformed
+#'  test statistic for comparing the survival rates of two survival curves at a
+#'  fixed point in time. This statistic is an implementation of the
+#' test statistic \eqn{X_2^2}{X2^2} in Klein et al.'s paper [1]. The test is a
+#' chi-squared test with one degree of freedom.
+#'
+#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' Statist. Med., 26: 4505-4519.
+#'
+#' @param data either a null object or a survfit object or a data frame that has
+#' the variables \code{time} specifying time to event or time to censoring,
+#' \code{status} specifying the censoring status and \code{group} specifying the
+#'  different groups to be compared.
+#' @param surv_KM either a null object or a numeric vector containing survival
+#' rates for one or two groups
+#' @param se_KM either a null object or a numeric vector containing standard
+#' errors for one or two groups
+#' @param t the point in time at which the survival rate will be calculated
+#'
+#' @return A numeric vector containing the survival rates for the different
+#' groups at time t.
+#'
+#' @examples
+#' data(exp_surv)
+#' log.test(exp_surv, t=1)
+#'
+#' library(survival)
+#' exp_fit <- survfit(formula = Surv(time, status) ~ group, data=exp_surv)
+#' log.test(exp_fit, t=1)
+#'
+#' library(tidyverse)
+#' exp_surv %>% filter(group == 1) -> exp_surv_grp1
+#' log.test(exp_surv_grp1, surv_KM=0.5, se_KM=0.08, t=1)
+#'
+#' log.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
+log.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Calculation and/or concatenation of survival data
+  surv_KM = get_surv_KM(data, surv_KM, t)
+  se_KM = get_se_KM(data, se_KM, t)
 
-  return(l)
+
+  # Construction of the htest results object
+  res <- list()
+  class(res) <- "htest"
+  res$null.value  <- c(0)
+  names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
+  res$alternative <- "greater" # A chi-squared test is always a one-sided test
+  res$method <- "Log-transformed test for equality of survival rates at a fixed point in time.
+
+  This test is using the log-transformed test statistic X2^2 from Klein et al.'s paper
+  'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
+  26 (2007). It is a chi-squared test with one degree of freedom."
+  res$data.name   <- sprintf(deparse(substitute(data)))
+  if(!is.null(t)){
+    res$parameters  <- c(t)
+    names(res$parameters) <- c("time")
+  }
+
+  # Survival rates and their difference
+  diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
+  res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
+  names(res$estimate) <- c("Survival rate of group 1",
+                           "Standard error of group 1",
+                           "Survival rate of group 2",
+                           "Standard error of group 2",
+                           "Absolute difference of rates")
+
+  # Test statistic
+  statistic <- log.t(surv_KM, se_KM)
+  res$statistic <- statistic
+  names(res$statistic) <- "log-transformed statistic X2^2"
+
+  # p-value, probability of log.t < t
+  res$p.value <- 1 - pchisq(statistic, df = 1)
+  return(res)
 }
 
-#-------------------------------------------------------------------------------
-# logit-trafo statistic
-X5 <- function(surv_KM, se_KM){
-  sigma_KM = get_sigma_KM(surv_KM, se_KM)
-  numerator = ( log(surv_KM[1]/(1-surv_KM[1])) - log(surv_KM[2]/(1-surv_KM[2])) )**2
-  denominator = sigma_KM[1]**2/(1-surv_KM[1])**2 + sigma_KM[2]**2/(1-surv_KM[2])**2
-  return(numerator/denominator)
+#' Clog-transformed test for difference of survival rates.
+#'
+#' This function tests two survival rates at a fixed point in time for equality.
+#' This test can also be used in order to compare the survival rate of a data
+#'  frame to some given numerical value. Therefore, there are three
+#' possibilities for data input, (1) data with two groups and
+#' null variables surv_KM and se_KM, (2) data with one group and two
+#' numeric vectors surv_KM and se_KM of length 1, (3) a null variable data and
+#' two numeric vectors surv_KM and se_KM of length 2. The test uses a clog-transformed
+#'  test statistic for comparing the survival rates of two survival curves at a
+#'  fixed point in time. This statistic is an implementation of the
+#' test statistic \eqn{X_3^2}{X3^2} in Klein et al.'s paper [1]. The test is a
+#' chi-squared test with one degree of freedom.
+#'
+#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' Statist. Med., 26: 4505-4519.
+#'
+#' @param data either a null object or a survfit object or a data frame that has
+#' the variables \code{time} specifying time to event or time to censoring,
+#' \code{status} specifying the censoring status and \code{group} specifying the
+#'  different groups to be compared.
+#' @param surv_KM either a null object or a numeric vector containing survival
+#' rates for one or two groups
+#' @param se_KM either a null object or a numeric vector containing standard
+#' errors for one or two groups
+#' @param t the point in time at which the survival rate will be calculated
+#'
+#' @return A numeric vector containing the survival rates for the different
+#' groups at time t.
+#'
+#' @examples
+#' data(exp_surv)
+#' clog.test(exp_surv, t=1)
+#'
+#' library(survival)
+#' exp_fit <- survfit(formula = Surv(time, status) ~ group, data=exp_surv)
+#' clog.test(exp_fit, t=1)
+#'
+#' library(tidyverse)
+#' exp_surv %>% filter(group == 1) -> exp_surv_grp1
+#' clog.test(exp_surv_grp1, surv_KM=0.5, se_KM=0.08, t=1)
+#'
+#' clog.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
+clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Calculation and/or concatenation of survival data
+  surv_KM = get_surv_KM(data, surv_KM, t)
+  se_KM = get_se_KM(data, se_KM, t)
+
+
+  # Construction of the htest results object
+  res <- list()
+  class(res) <- "htest"
+  res$null.value  <- c(0)
+  names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
+  res$alternative <- "greater" # A chi-squared test is always a one-sided test
+  res$method <- "Clog-transformed test for equality of survival rates at a fixed point in time.
+
+  This test is using the clog-transformed test statistic X2^2 from Klein et al.'s paper
+  'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
+  26 (2007). It is a chi-squared test with one degree of freedom."
+  res$data.name   <- sprintf(deparse(substitute(data)))
+  if(!is.null(t)){
+    res$parameters  <- c(t)
+    names(res$parameters) <- c("time")
+  }
+
+  # Survival rates and their difference
+  diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
+  res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
+  names(res$estimate) <- c("Survival rate of group 1",
+                           "Standard error of group 1",
+                           "Survival rate of group 2",
+                           "Standard error of group 2",
+                           "Absolute difference of rates")
+
+  # Test statistic
+  statistic <- clog.t(surv_KM, se_KM)
+  res$statistic <- statistic
+  names(res$statistic) <- "clog-transformed statistic X3^2"
+
+  # p-value, probability of clog.t < t
+  res$p.value <- 1 - pchisq(statistic, df = 1)
+  return(res)
 }
 
-X5.test <- function(surv_KM, se_KM, conf.level = 0.95){
-  statistic <- X5(surv_KM, se_KM)
-  result <- statistic > qchisq(conf.level, 1)
-  l = c(statistic, result, "logit-transformed statistic X5")
-  names(l) <- c("statistic", "result", "method")
+#' Arc sine and square root-transformed test for difference of survival rates.
+#'
+#' This function tests two survival rates at a fixed point in time for equality.
+#' This test can also be used in order to compare the survival rate of a data
+#'  frame to some given numerical value. Therefore, there are three
+#' possibilities for data input, (1) data with two groups and
+#' null variables surv_KM and se_KM, (2) data with one group and two
+#' numeric vectors surv_KM and se_KM of length 1, (3) a null variable data and
+#' two numeric vectors surv_KM and se_KM of length 2. The test uses a test statistic
+#' with an arc-sine square-root transformation for comparing the survival rates
+#' of two survival curves at a fixed point in time. This statistic is an
+#' implementation of the test statistic \eqn{X_4^2}{X4^2} in Klein et al.'s paper
+#'  [1]. The test is a chi-squared test with one degree of freedom.
+#'
+#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' Statist. Med., 26: 4505-4519.
+#'
+#' @param data either a null object or a survfit object or a data frame that has
+#' the variables \code{time} specifying time to event or time to censoring,
+#' \code{status} specifying the censoring status and \code{group} specifying the
+#'  different groups to be compared.
+#' @param surv_KM either a null object or a numeric vector containing survival
+#' rates for one or two groups
+#' @param se_KM either a null object or a numeric vector containing standard
+#' errors for one or two groups
+#' @param t the point in time at which the survival rate will be calculated
+#'
+#' @return A numeric vector containing the survival rates for the different
+#' groups at time t.
+#'
+#' @examples
+#' data(exp_surv)
+#' asinsqrt.test(exp_surv, t=1)
+#'
+#' library(survival)
+#' exp_fit <- survfit(formula = Surv(time, status) ~ group, data=exp_surv)
+#' asinsqrt.test(exp_fit, t=1)
+#'
+#' library(tidyverse)
+#' exp_surv %>% filter(group == 1) -> exp_surv_grp1
+#' asinsqrt.test(exp_surv_grp1, surv_KM=0.5, se_KM=0.08, t=1)
+#'
+#' asinsqrt.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
+asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Calculation and/or concatenation of survival data
+  surv_KM = get_surv_KM(data, surv_KM, t)
+  se_KM = get_se_KM(data, se_KM, t)
 
-  return(l)
+
+  # Construction of the htest results object
+  res <- list()
+  class(res) <- "htest"
+  res$null.value  <- c(0)
+  names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
+  res$alternative <- "greater" # A chi-squared test is always a one-sided test
+  res$method <- "Arc-sine and square-root transformed test for equality of survival rates at a fixed point in time.
+
+  This test is test statistic X4^2 transformed using arc-sine and square-root
+  from Klein et al.'s paper 'Analyzing survival curves at a fixed point in time',
+  published in Stat. Med., 26 (2007). It is a chi-squared test with one degree of freedom."
+  res$data.name   <- sprintf(deparse(substitute(data)))
+  if(!is.null(t)){
+    res$parameters  <- c(t)
+    names(res$parameters) <- c("time")
+  }
+
+  # Survival rates and their difference
+  diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
+  res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
+  names(res$estimate) <- c("Survival rate of group 1",
+                           "Standard error of group 1",
+                           "Survival rate of group 2",
+                           "Standard error of group 2",
+                           "Absolute difference of rates")
+
+  # Test statistic
+  statistic <- asinsqrt.t(surv_KM, se_KM)
+  res$statistic <- statistic
+  names(res$statistic) <- "asinsqrt-transformed statistic X4^2"
+
+  # p-value, probability of asinsqrt.t < t
+  res$p.value <- 1 - pchisq(statistic, df = 1)
+  return(res)
+}
+
+#' Logit-transformed test for difference of survival rates.
+#'
+#' This function tests two survival rates at a fixed point in time for equality.
+#' This test can also be used in order to compare the survival rate of a data
+#'  frame to some given numerical value. Therefore, there are three
+#' possibilities for data input, (1) data with two groups and
+#' null variables surv_KM and se_KM, (2) data with one group and two
+#' numeric vectors surv_KM and se_KM of length 1, (3) a null variable data and
+#' two numeric vectors surv_KM and se_KM of length 2. The test uses a logit-transformed
+#'  test statistic for comparing the survival rates of two survival curves at a
+#'  fixed point in time. This statistic is an implementation of the
+#' test statistic \eqn{X_5^2}{X5^2} in Klein et al.'s paper [1]. The test is a
+#' chi-squared test with one degree of freedom.
+#'
+#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' Statist. Med., 26: 4505-4519.
+#'
+#' @param data either a null object or a survfit object or a data frame that has
+#' the variables \code{time} specifying time to event or time to censoring,
+#' \code{status} specifying the censoring status and \code{group} specifying the
+#'  different groups to be compared.
+#' @param surv_KM either a null object or a numeric vector containing survival
+#' rates for one or two groups
+#' @param se_KM either a null object or a numeric vector containing standard
+#' errors for one or two groups
+#' @param t the point in time at which the survival rate will be calculated
+#'
+#' @return A numeric vector containing the survival rates for the different
+#' groups at time t.
+#'
+#' @examples
+#' data(exp_surv)
+#' logit.test(exp_surv, t=1)
+#'
+#' library(survival)
+#' exp_fit <- survfit(formula = Surv(time, status) ~ group, data=exp_surv)
+#' logit.test(exp_fit, t=1)
+#'
+#' library(tidyverse)
+#' exp_surv %>% filter(group == 1) -> exp_surv_grp1
+#' logit.test(exp_surv_grp1, surv_KM=0.5, se_KM=0.08, t=1)
+#'
+#' logit.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
+logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Calculation and/or concatenation of survival data
+  surv_KM = get_surv_KM(data, surv_KM, t)
+  se_KM = get_se_KM(data, se_KM, t)
+
+
+  # Construction of the htest results object
+  res <- list()
+  class(res) <- "htest"
+  res$null.value  <- c(0)
+  names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
+  res$alternative <- "greater" # A chi-squared test is always a one-sided test
+  res$method <- "logit-transformed test for equality of survival rates at a fixed point in time.
+
+  This test is using the logit-transformed test statistic X5^2 from Klein et al.'s paper
+  'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
+  26 (2007). It is a chi-squared test with one degree of freedom."
+  res$data.name   <- sprintf(deparse(substitute(data)))
+  if(!is.null(t)){
+    res$parameters  <- c(t)
+    names(res$parameters) <- c("time")
+  }
+
+  # Survival rates and their difference
+  diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
+  res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
+  names(res$estimate) <- c("Survival rate of group 1",
+                           "Standard error of group 1",
+                           "Survival rate of group 2",
+                           "Standard error of group 2",
+                           "Absolute difference of rates")
+
+  # Test statistic
+  statistic <- logit.t(surv_KM, se_KM)
+  res$statistic <- statistic
+  names(res$statistic) <- "logit-transformed statistic X5^2"
+
+  # p-value, probability of logit.t < t
+  res$p.value <- 1 - pchisq(statistic, df = 1)
+  return(res)
 }
