@@ -1,4 +1,8 @@
-#' Exponential survival data.
+# ------------------------------------------------------------------------------
+# SIMULATED EXAMPLE DATA
+
+
+#' Exponential survival data frame
 #'
 #' Simulated survival data with exponential event times and exponential
 #'  censoring times.
@@ -20,8 +24,6 @@
 #' library(survival)
 #'
 #' data(exp_surv)
-#' exp_fit <- survft(Surv(time, status) ~ group, data=exp_surv)
+#' exp_fit <- survfit(Surv(time, status) ~ group, data=exp_surv)
 #' autoplot(exp_fit)
-#'
-#' \donttest{iplotCurves(phe, times)}
 "exp_surv"

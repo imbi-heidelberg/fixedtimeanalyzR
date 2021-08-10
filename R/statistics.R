@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# DIFFERENT TEST STATISTICS FOR COMPARING SURVIVAL CURVES
+# TEST STATISTICS FOR COMPARING SURVIVAL CURVES
 
 
 #' Naive test statistic.
@@ -8,8 +8,8 @@
 #' two survival curves at a fixed point in time. It is an implementation of the
 #' test statistic \eqn{X_1^2}{X1^2} in Klein et al.'s paper [1].
 #'
-#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
-#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' @references [1]  Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \href{https://doi.org/10.1002/sim.2864}{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
 #' @param surv_KM a numeric vector containing survival rates for two groups
@@ -20,8 +20,8 @@
 #' @examples
 #' data(exp_surv)
 #'
-#' surv_KM = get_surv_KM(exp_surv, 1)
-#' se_KM = get_se_KM(exp_surv, 1)
+#' surv_KM = get_surv_KM(exp_surv, t=1)
+#' se_KM = get_se_KM(exp_surv, t=1)
 #' naive.t(surv_KM, se_KM)
 #'
 #' @export
@@ -37,7 +37,7 @@ naive.t <- function(surv_KM, se_KM){
 #' test statistic \eqn{X_2^2}{X2^2} in Klein et al.'s paper [1].
 #'
 #' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
-#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' \href{https://doi.org/10.1002/sim.2864}{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
 #' @param surv_KM a numeric vector containing survival rates for two groups
@@ -48,12 +48,12 @@ naive.t <- function(surv_KM, se_KM){
 #' @examples
 #' data(exp_surv)
 #'
-#' surv_KM = get_surv_KM(exp_surv, 1)
-#' se_KM = get_se_KM(exp_surv, 1)
-#' log.t(surv_KM, se_KM)
+#' surv_KM = get_surv_KM(exp_surv, t=1)
+#' se_KM = get_se_KM(exp_surv, t=1)
+#' logtra.t(surv_KM, se_KM)
 #'
 #' @export
-log.t <- function(surv_KM, se_KM){
+logtra.t <- function(surv_KM, se_KM){
   sigma_KM = get_sigma_KM(surv_KM, se_KM)
   return( (log(surv_KM[1])-log(surv_KM[2]))**2/ (sigma_KM[1]**2 + sigma_KM[2]**2) )
 }
@@ -65,8 +65,8 @@ log.t <- function(surv_KM, se_KM){
 #' transformation of the survival function. It is an implementation of the
 #' test statistic \eqn{X_3^2}{X3^2} in Klein et al.'s paper [1].
 #'
-#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
-#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' @references [1]  Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \href{https://doi.org/10.1002/sim.2864}{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
 #' @param surv_KM a numeric vector containing survival rates for two groups
@@ -77,8 +77,8 @@ log.t <- function(surv_KM, se_KM){
 #' @examples
 #' data(exp_surv)
 #'
-#' surv_KM = get_surv_KM(exp_surv, 1)
-#' se_KM = get_se_KM(exp_surv, 1)
+#' surv_KM = get_surv_KM(exp_surv, t=1)
+#' se_KM = get_se_KM(exp_surv, t=1)
 #' clog.t(surv_KM, se_KM)
 #'
 #' @export
@@ -97,8 +97,8 @@ clog.t <- function(surv_KM, se_KM){
 #' transformation of the survival function. It is an implementation of the
 #' test statistic \eqn{X_4^2}{X4^2} in Klein et al.'s paper [1].
 #'
-#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
-#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' @references [1]  Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \href{https://doi.org/10.1002/sim.2864}{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
 #' @param surv_KM a numeric vector containing survival rates for two groups
@@ -109,8 +109,8 @@ clog.t <- function(surv_KM, se_KM){
 #' @examples
 #' data(exp_surv)
 #'
-#' surv_KM = get_surv_KM(exp_surv, 1)
-#' se_KM = get_se_KM(exp_surv, 1)
+#' surv_KM = get_surv_KM(exp_surv, t=1)
+#' se_KM = get_se_KM(exp_surv, t=1)
 #' asinsqrt.t(surv_KM, se_KM)
 #'
 #' @export
@@ -130,8 +130,8 @@ asinsqrt.t <- function(surv_KM, se_KM){
 #' transformation of the survival function. It is an implementation of the
 #' test statistic \eqn{X_5^2}{X5^2} in Klein et al.'s paper [1].
 #'
-#' [1] - Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
-#' \link[https://doi.org/10.1002/sim.2864]{Analyzing survival curves at a fixed point in time}.
+#' @references [1]  Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007),
+#' \href{https://doi.org/10.1002/sim.2864}{Analyzing survival curves at a fixed point in time}.
 #' Statist. Med., 26: 4505-4519.
 #'
 #' @param surv_KM a numeric vector containing survival rates for two groups
@@ -142,8 +142,8 @@ asinsqrt.t <- function(surv_KM, se_KM){
 #' @examples
 #' data(exp_surv)
 #'
-#' surv_KM = get_surv_KM(exp_surv, 1)
-#' se_KM = get_se_KM(exp_surv, 1)
+#' surv_KM = get_surv_KM(exp_surv, t=1)
+#' se_KM = get_se_KM(exp_surv, t=1)
 #' logit.t(surv_KM, se_KM)
 #'
 #' @export
