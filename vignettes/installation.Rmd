@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 Currently, there are three ways in order to install **fixedtimeanalyzR**.
 
-# Installation using devtools via GitHub
+## Installation using devtools via GitHub
 
 **Step 1:** Make sure that you have access to the IMBI Heidelberg repository `github.com/imbi-heidelberg`.
 
@@ -38,11 +38,9 @@ devtools::install_github(repo="https://github.com/imbi-heidelberg/fixedtimeanaly
                          auth_token="<your personal access token>",
                          build_vignettes=TRUE)
 ```
-We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`.
+We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`. Success!
 
-Success! You may now load the package via `library(fixetimeanalyzR)`.
-
-# Installation using devtools and the package directory
+## Installation using devtools and the package directory
 
 **Step 1:** Download or copy the whole package directory `fixedtimeanalyzR\` to your hard drive.
 
@@ -55,14 +53,10 @@ install.packages("devtools")
 ```{r, eval=FALSE}
 devtools::install(build_vignettes=TRUE)
 ```
-We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`.
+We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`. Success!
 
-Success! You may now load the package via `library(fixetimeanalyzR)`.
-
-# Installation using RStudio and the .tar.gz file
+## Installation using RStudio and the .tar.gz file
 
 **Step 1:** Download or copy the .tar.gz file to your hard drive.
 
-**Step 2:** Launch RStudio and switch to the **Packages** tab. Click **Install > Install from: Package Archive File (.zip, .tar.gz)** and select the .tar.gz file.
-
-Success! You may now load the package via `library(fixetimeanalyzR)`.
+**Step 2:** Launch RStudio and switch to the **Packages** tab. Click **Install > Install from: Package Archive File (.zip, .tar.gz)** and select the .tar.gz file. Success!

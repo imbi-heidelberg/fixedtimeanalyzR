@@ -2,7 +2,7 @@
 
 This package implements several methods for comparing survival curves at a fixed point in time. The tests are Chi-Square-Tests that rely on test statistics developed by John P. Klein et al. in their article "Analyzing survival curves at a fixed point in time" published in Statistics in Medicine 26 (2007).
 
-## Installation instruction
+## Installation instructions
 
 Currently, there are three ways in order to install **fixedtimeanalyzR**.
 
@@ -23,9 +23,7 @@ devtools::install_github(repo="https://github.com/imbi-heidelberg/fixedtimeanaly
                          auth_token="<your personal access token>",
                          build_vignettes=TRUE)
 ```
-We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`.
-
-Success! You may now load the package via `library(fixetimeanalyzR)`.
+We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`. Success!
 
 ### Installation using devtools and the package directory
 
@@ -40,17 +38,13 @@ install.packages("devtools")
 ```{r, eval=FALSE}
 devtools::install(build_vignettes=TRUE)
 ```
-We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`.
-
-Success! You may now load the package via `library(fixetimeanalyzR)`.
+We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`. Success!
 
 ### Installation using RStudio and the .tar.gz file
 
 **Step 1:** Download or copy the .tar.gz file to your hard drive.
 
-**Step 2:** Launch RStudio and switch to the **Packages** tab. Click **Install > Install from: Package Archive File (.zip, .tar.gz)** and select the .tar.gz file.
-
-Success! You may now load the package via `library(fixetimeanalyzR)`.
+**Step 2:** Launch RStudio and switch to the **Packages** tab. Click **Install > Install from: Package Archive File (.zip, .tar.gz)** and select the .tar.gz file. Success!
 
 ## Browsing the vignettes
 
@@ -58,4 +52,4 @@ You may the browse the vignettes by running:
 ```{r}
 browseVignettes("fixedtimeanalyzR")
 ```
-A small tutorial can be found in the introduction vignette.
+A small tutorial on how to use fixedtimeanalyzR can be found in the introduction vignette.

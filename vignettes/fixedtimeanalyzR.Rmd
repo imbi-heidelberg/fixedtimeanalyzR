@@ -25,10 +25,10 @@ When comparing censored survival data of two groups, it is most common to use a 
 In this case, alternative methods are necessary for comparing survival rates. John P. Klein et al.^[Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007), [Analyzing survival curves at a fixed point in time](https://doi.org/10.1002/sim.2864). Statist. Med., 26: 4505-4519.] developed test statistics for comparing the numerical values of survival rates, which are implemented in this package.
 
 # Examples
-Setup instructions can be found in the [installation vignette](installation.html). In the examples, we will use the following packages:
+Setup instructions can be found in the [installation vignette](installation.html). In the following examples, we will use the following packages:
 
 ```{r, message=FALSE}
-library(tidyverse)
+library(dplyr)
 library(survival)
 library(fixedtimeanalyzR)
 ```
