@@ -1,0 +1,30 @@
+---
+title: "Installation instructions for fixedtimeanalyzR"
+author: "Lukas D. Sauer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+description: >
+  This vignette explains how to install fixedtimeanalyzR from GitHub and from the
+  .tar.gz file.
+vignette: >
+  %\VignetteIndexEntry{Installation instructions for fixedtimeanalyzR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Currently, there are two ways in order to install **fixedtimeanalyzR**.
+
+# Installation using devtools via GitHub
+
+Make sure that you have access to the IMBI Heidelberg repository `github.com/imbi-heidelberg`. If you haven't already installed `devtools`, install it via
+```{r}
+install.packages("devtools")
+```
+

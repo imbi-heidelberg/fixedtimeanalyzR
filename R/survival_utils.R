@@ -103,7 +103,8 @@ get_surv_KM <- function(data = NULL, surv_KM = NULL, t = NULL){
   if(!is.null(data) & is.null(surv_KM) & n_groups == 2){
     return(get_surv_KM_from_data(data, t))
   }
-  else if(length(surv_KM) == 1 & n_groups == 1 & is.numeric(surv_KM)){
+  else if(length(surv_KM) == 1 & (n_groups == 1 | n_groups == 0) & is.numeric(surv_KM)){
+    if(n_groups == 0){warning("No group variable was detected in the data frame. Assuming that there is only one group.")}
     return(c(get_surv_KM_from_data(data,t), surv_KM))
   } else if(length(surv_KM) == 2 & is.null(data) & is.numeric(surv_KM)){
     if(!is.null(t)){
@@ -164,7 +165,8 @@ get_se_KM <- function(data = NULL, se_KM = NULL, t = NULL){
   if(!is.null(data) & is.null(se_KM) & n_groups == 2){
     return(get_se_KM_from_data(data, t))
   }
-  else if(length(se_KM) == 1 & n_groups == 1 & is.numeric(se_KM)){
+  else if(length(se_KM) == 1 & (n_groups == 1| n_groups == 0) & is.numeric(se_KM)){
+    if(n_groups == 0){warning("No group variable was detected in the data frame. Assuming that there is only one group.")}
     return(c(get_se_KM_from_data(data,t), se_KM))
   } else if(length(se_KM) == 2 & is.null(data) & is.numeric(se_KM)){
     if(!is.null(t)){
@@ -221,14 +223,24 @@ get_sigma_KM <- function(surv_KM, se_KM){
 #'
 #' @export
 get_survfit <- function(data){
-  if(!("time" %in% names(data) && "status" %in% names(data)
-       && "group" %in% names(data))) {
-    stop("Data set must contain the variables time, status and group.")
+  # If data is of type survfit or null, don't change anything.
+  if(methods::is(data, "survfit") | is.null(data)){
+    return(data)
+  }
+  # Check whether data has variables time and status
+  if(!("time" %in% names(data) && "status" %in% names(data))) {
+    stop("Data set must contain the variables time and status.")
   }
   # check for numeric time variable.
   if (!is.numeric(data$time)) {
     stop("Variable time must be a numeric vector.")
   }
-  return(survival::survfit(formula = survival::Surv(time, status) ~ group, data=data))
+  # Split by group, in case such a variable exists.
+  if("group" %in% names(data)){
+    return(survival::survfit(formula = survival::Surv(time, status) ~ group, data=data))
+  }
+  else{
+    return(survival::survfit(formula = survival::Surv(time, status) ~ 1, data=data))
+  }
 }
 

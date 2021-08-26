@@ -4,10 +4,9 @@ author: "Lukas D. Sauer"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 description: >
-  This vignette is a basic introduction to the mathematical idea behind and the
-  functionality of the fixedtimeanalyzR package. This package offers alternative
-  methods for comparing censored survival data in cases where a log-rank test is
-  not applicable.
+  This vignette is a basic introduction to the usage of the fixedtimeanalyzR
+   package. This package offers alternative methods for comparing censored 
+   survival data in cases where a log-rank test is not applicable.
 vignette: >
   %\VignetteIndexEntry{Introduction to survival analysis with fixedtimeanalyzR}
   %\VignetteEngine{knitr::rmarkdown}
@@ -21,62 +20,150 @@ knitr::opts_chunk$set(
 )
 ```
 
-When comparing censored survival data of two groups, it is most common to use a log-rank test. However, it is not always possible to apply a log-rank test: Imagine that you would like to compare the survival rate of your lung cancer patients to the survival rate from a closed-access publication. In this case, alternative methods are necessary for comparing survival rates. John P. Klein et al. developed test statistics for comparing the numerical values of survival rates, which are implemented in this package.
+When comparing censored survival data of two groups, it is most common to use a log-rank test. However, it is not always possible to apply a log-rank test: Imagine that you would like to compare the survival rate of your lung cancer patients to the survival rate from a closed-access publication. Whenever the full survival data set is not available, a log-rank test is not applicable.
 
-# Example 1: Comparing a dataset to a numerical value
+In this case, alternative methods are necessary for comparing survival rates. John P. Klein et al.^[Klein, J.P., Logan, B., Harhoff, M. and Andersen, P.K. (2007), [Analyzing survival curves at a fixed point in time](https://doi.org/10.1002/sim.2864). Statist. Med., 26: 4505-4519.] developed test statistics for comparing the numerical values of survival rates, which are implemented in this package.
 
-Consider the **NCCTG Lung Cancer Data** from the `survival`package.
-```{r}
-lung
+# Examples
+Setup instructions can be found in the [installation vignette](installation.html). In the examples, we will use the following packages:
+
+```{r, message=FALSE}
+library(tidyverse)
+library(survival)
+library(fixedtimeanalyzR)
+```
+
+## Example 1: Comparing one group to a numerical value
+
+Consider the *NCCTG Lung Cancer Data* from the `survival` package.
+```{r, results=FALSE}
 data(cancer, package="survival")
+lung
+```
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(lung, 5))
+```
+It contains the two variables necessary for **fixedtimeanalyzR** to work:
+
+- `time`, specifying the time to event or censoring for each row,
+- `status`, specifying whether the event in the row was an actual event or merely the censoring of an individual. It may have the same codes as the `event` variable of the `Surv` object from the `survival` package. This means that we can have the following codes: 0=censored and 1=event, or 1=censored and 2=event or FALSE=censored and TRUE=event.
+
+
+Apart from these two variables, a data set may contain a variable `group`, specifying the treatment group that each individual belongs to. This will be discussed in the next example.
+
+Let's suppose that we want to compare the survival rate to a given value. We claim that the survival rate of the `lung` cancer patients after 365 days is different from 60% (with a standard error of 5%).
+
+**fixedtimeanalyzR** provides different tests for this comparison. Each test is a chi-squared test with one degree of freedom, but they differ in the choice of their test statistics. For this example, we choose a clog-transformed statistic, the other statistics will be explained further down.
+
+Comparison is now as easy as writing
+```{r}
+clog.test(lung, surv_KM=0.6, se_KM=0.05, t=365)
+```
+where `clog.test` is the statistical test based on the clog-transformed test statistic, `surv_KM` is the Kaplan-Meier survival rate, `se_KM` is the corresponding standard error, and `t` is the time at which we want to compare.
+
+
+We obtain an estimated survival rate of approximately 41% for the `lung` data set, and p-value of 0.003, meaning that the difference between our data set and the reference value of 60% is statistically significant with respect to a significance level of 5%.
+
+The function output is a list of class `htest`, containing a lot of information on the test. For example, use `clog.test(lung, surv_KM=0.6, se_KM=0.05, t=365)$p.value` to get the p-value and `clog.test(lung, surv_KM=0.6, se_KM=0.05, t=365)$statistic` in order to get the value of the test statistic.
+
+## Example 2: Comparing two groups to each other
+
+Instead of comparing two groups via a log-rank test, you can also use this package to compare two groups at a fixed point in time, using Klein et al.'s methods. Consider the  data set `aml`, containing time to censoring/time to death for patients with acute myelogenous leukemia.
+```{r, results=FALSE}
+data(cancer, package="survival")
+aml
+```
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(aml, 5))
 ```
 
+According to the [`survival` package documentation](https://cran.r-project.org/web/packages/survival/survival.pdf), the variable `x` describes "whether the standard course of chemotherapy [was] extended (’maintainance’) for additional cycles".
 
-
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+In order to compare these two treatment groups, we need to rename the variable `x`.
+```{r}
+aml %>% rename(group = x) -> amll
 ```
+Now, we're all set. We can compare the survival rate at `time==20` for the two treatment groups using the same test as in example 1.
+```{r}
+clog.test(amll, t=20)
+```
+The survival rate estimate at  `time==20` of the "maintained" group is 72%, which is higher than the estimate for the group for which chemotherapy was not maintained (58%). However, as consequence of the large standard errors, this difference is not statistically significant with respect to a significance level of 5%.
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+## Example 3: Comparing two numerical values
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+Finally, it is also possible to compare the numerical values of two survival rates. Let us suppose that we want to compare the survival rate 50% (SE 5%) to the rate 60% (SE 6%). This can be achieved by typing
+```{r}
+clog.test(surv_KM=c(0.5, 0.6), se_KM=c(0.05,0.06))
+```
+Again, we see that the difference of these two rates is not statistically significant with respect to a significance level of 0.05.
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+## Example 4: Passing a survfit object
 
-## More Examples
+Internally, **fixedtimeanalyzR** coerces a the data frame `data` into an object of class `survfit`. Instead of passing a data frame, it is also possible to directly pass a `survfit` object to the tests. This may have two advantages:
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+* You gain code speed when running a lot of tests.
+* You have the possibility of choosing your own variable names instead of `time`, `status` and `group`.
+
+Have a look at the following data frame from the survival package, containing the data of 2982 primary breast cancer patients from the *Rotterdam tumor bank*.
+
+```{r, results=FALSE}
+data(cancer, package="survival")
+rotterdam
+```
 
 ```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+knitr::kable(head(rotterdam, 5))
 ```
 
-Also a quote using `>`:
+We will set up a `survfit` object with time to death/time to censoring `dtime`, status variable `death` where 0=alive and 1=dead and the application of chemotherapy `chemo` as a grouping variable.
+```{r}
+rotterdamfit = survfit(formula = Surv(dtime, death) ~ chemo, data=rotterdam)
+```
+Now, this object can be passed to our test as before. We will test for the survival rate after three years, i.e. 1095 days.
+```{r}
+clog.test(rotterdamfit, t=1095)
+```
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+
+# Background: Different test statistics
+
+Apart from `clog.test`, four more tests relying on different test statistics are implemented in **fixedtimeanalyzR**. Each test statistic is taken from Klein et al.'s article.
+
+The test `naive.test` simply relies on the test statistic
+
+$$ X_1^2=\frac{(S_1(t)-S_2(t))^2}{\mathrm{se}(t)_1^2 + \mathrm{se}(t)_2^2},$$
+where $S_i(t)$ are the survival rates at time $t$ for each group $i$, and $se_i(t)$ are the respective standard errors.
+
+The test `logtra.test` relies on the log-transformed test statistic
+
+$$ X_2^2=\frac{(\log(S_1(t))-\log(S_2(t)))^2}{\sigma_1(t)^2 + \sigma_2(t)^2}$$
+with the quotient $\sigma_i(t)=\frac{\mathrm{se}_i(t)}{S_i(t)}$. The square of this quotient can be calculated by Greenwood's formula, we maintain this notation for the sake of better readability.
+
+The test `clog.test` relies on the the clog-transformed test statistic
+
+$$ X_3^2 = \frac{(\log(-\log(S_1(t)))-\log(-\log(S_2(t))))^2}{( \sigma_1(t)/\log(S_1(t)) )^2+( \sigma_2(t)/\log(S_2(t)) )^2}.$$
+The test `asinsqrt.test` relies on the following test statistic transformed by arc sine and square root:
+$$ X_4^2 = \frac{\left( \arcsin(\sqrt{S_1(t)})-\arcsin(\sqrt{S_2(t)})\right)^2}{\nu_1(t)+\nu_2(t)}$$
+where $\nu_i(t) = \frac{S_i(t)\sigma_i(t)^2}{ 4(1-S_i(t))}$.
+
+Finally, the test `logit.test` relies on the logit-transformed test statistic
+$$ X_5^2 = \frac{\left( \log\frac{S_1(t)}{1-S_1(t)} - \log\frac{S_2(t)}{1-S_2(t)} \right)^2}{\frac{\sigma_1(t)^2}{1-S_1(t)^2} + \frac{\sigma_2(t)^2}{1-S_2(t)^2}}.$$
+For example, we could compare the p-values of the different tests:
+```{r}
+data = lung
+surv_KM = 0.6
+se_KM = 0.05
+t=365
+p.vals = c(naive.test(data, surv_KM, se_KM, t)$p.value,
+           logtra.test(data, surv_KM, se_KM, t)$p.value,
+           clog.test(data, surv_KM, se_KM, t)$p.value,
+           asinsqrt.test(data, surv_KM, se_KM, t)$p.value,
+           logit.test(data, surv_KM, se_KM, t)$p.value)
+names(p.vals) = c("Naive test",
+                  "log test",
+                  "clog test",
+                  "asin&sqrt test",
+                  "logit test")
+p.vals
+```
+

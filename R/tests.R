@@ -49,13 +49,17 @@
 #'
 #' @export
 naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Save data name
+  res <- list()
+  res$data.name   <- sprintf(deparse(substitute(data)))
+  # Convert data to survfit object - nothing happens when data is already survfit
+  data = get_survfit(data)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
 
 
   # Construction of the htest results object
-  res <- list()
   class(res) <- "htest"
   res$null.value  <- c(0)
   names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
@@ -65,19 +69,25 @@ naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   This test is using the naive test statistic X1^2 from Klein et al.'s paper
   'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
   26 (2007). It is a chi-squared test with one degree of freedom."
-  res$data.name   <- sprintf(deparse(substitute(data)))
   if(!is.null(t)){
     res$parameters  <- c(t)
     names(res$parameters) <- c("time")
   }
 
   # Survival rates and their difference
+  if(!is.null(data$strata)){
+    grp_names <- names(data$strata)
+  } else if(!is.null(data)){
+    grp_names <- c("data", "numeric input")
+  } else{
+    grp_names <- c("numeric input 1", "numeric input 2")
+  }
   diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
   res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
-  names(res$estimate) <- c("Survival rate of group 1",
-                           "Standard error of group 1",
-                           "Survival rate of group 2",
-                           "Standard error of group 2",
+  names(res$estimate) <- c(paste("Survival rate of ", grp_names[1]),
+                           paste("Standard error of ", grp_names[1]),
+                           paste("Survival rate of ", grp_names[2]),
+                           paste("Standard error of ", grp_names[2]),
                            "Absolute difference of rates")
 
   # Test statistic
@@ -137,6 +147,8 @@ naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #'
 #' @export
 logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Convert data to survfit object - nothing happens when data is already survfit
+  data = get_survfit(data)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -160,6 +172,7 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   }
 
   # Survival rates and their difference
+  grp_names <- names(data$strata)
   diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
   res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
   names(res$estimate) <- c("Survival rate of group 1",
@@ -225,6 +238,11 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #'
 #' @export
 clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Save data name
+  res <- list()
+  res$data.name   <- sprintf(deparse(substitute(data)))
+  # Convert data to survfit object - nothing happens when data is already survfit
+  data = get_survfit(data)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -241,19 +259,19 @@ clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   This test is using the clog-transformed test statistic X2^2 from Klein et al.'s paper
   'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
   26 (2007). It is a chi-squared test with one degree of freedom."
-  res$data.name   <- sprintf(deparse(substitute(data)))
   if(!is.null(t)){
     res$parameters  <- c(t)
     names(res$parameters) <- c("time")
   }
 
   # Survival rates and their difference
+  grp_names <- names(data$strata)
   diff_surv_KM <- abs(surv_KM[1] - surv_KM[2])
   res$estimate <- c(surv_KM[1], se_KM[1], surv_KM[2], se_KM[2], diff_surv_KM)
-  names(res$estimate) <- c("Survival rate of group 1",
-                           "Standard error of group 1",
-                           "Survival rate of group 2",
-                           "Standard error of group 2",
+  names(res$estimate) <- c(paste("Survival rate of", grp_names[1]),
+                           paste("Standard error of", grp_names[1]),
+                           paste("Survival rate of", grp_names[2]),
+                           paste("Standard error of", grp_names[2]),
                            "Absolute difference of rates")
 
   # Test statistic
@@ -313,6 +331,8 @@ clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #'
 #' @export
 asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Convert data to survfit object - nothing happens when data is already survfit
+  data = get_survfit(data)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -401,6 +421,8 @@ asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #'
 #' @export
 logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Convert data to survfit object - nothing happens when data is already survfit
+  data = get_survfit(data)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
