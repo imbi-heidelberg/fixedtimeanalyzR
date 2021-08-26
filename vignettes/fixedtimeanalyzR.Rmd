@@ -32,7 +32,7 @@ library(dplyr)
 library(survival)
 library(fixedtimeanalyzR)
 ```
-
+Note that **fixedtimeanalyzR** ships with a small simulated data frame with exponential survival times, `data(exp_surv)`, which can be used for demonstration purposes. However, this vignette uses different "real life data frames" from the `survival` package.
 ## Example 1: Comparing one group to a numerical value
 
 Consider the *NCCTG Lung Cancer Data* from the `survival` package.
