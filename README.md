@@ -2,11 +2,11 @@
 
 This package implements several methods for comparing survival curves at a fixed point in time. The tests are Chi-Square-Tests that rely on test statistics developed by John P. Klein et al. in their article "Analyzing survival curves at a fixed point in time" published in Statistics in Medicine 26 (2007).
 
-## Installation instructions
+## Setup instructions
 
 Currently, there are three ways in order to install **fixedtimeanalyzR**.
 
-### Installation using devtools via GitHub
+### Setup using devtools via GitHub
 
 **Step 1:** Make sure that you have access to the IMBI Heidelberg repository `github.com/imbi-heidelberg`.
 
@@ -25,7 +25,7 @@ devtools::install_github(repo="https://github.com/imbi-heidelberg/fixedtimeanaly
 ```
 We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`. Success!
 
-### Installation using devtools and the package directory
+### Setup using devtools and the package directory
 
 **Step 1:** Download or copy the whole package directory `fixedtimeanalyzR\` to your hard drive.
 
@@ -40,7 +40,7 @@ devtools::install(build_vignettes=TRUE)
 ```
 We assume that you also want to build the package vignettes. If this is not the case, you may omit the option `build_vignettes=TRUE`. Success!
 
-### Installation using RStudio and the .tar.gz file
+### Setup using RStudio and the .tar.gz file
 
 **Step 1:** Download or copy the .tar.gz file to your hard drive.
 
