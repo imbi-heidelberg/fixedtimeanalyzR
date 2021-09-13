@@ -186,7 +186,7 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   res$statistic <- statistic
   names(res$statistic) <- "log-transformed statistic X2^2"
 
-  # p-value, probability of log.t < t
+  # p-value, probability of logtra.t < t
   res$p.value <- 1 - stats::pchisq(statistic, df = 1)
   return(res)
 }
