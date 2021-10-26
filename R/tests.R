@@ -48,12 +48,13 @@
 #' naive.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
 #'
 #' @export
-naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
+                       group = NULL, time=NULL, status=NULL) {
   # Save data name
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data)
+  data = get_survfit(data, group, time, status)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
