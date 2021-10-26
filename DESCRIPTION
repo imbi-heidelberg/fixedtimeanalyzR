@@ -22,7 +22,8 @@ Suggests:
     ggfortify,
     dplyr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: false
