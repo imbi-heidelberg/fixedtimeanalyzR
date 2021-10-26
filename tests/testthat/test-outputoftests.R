@@ -1,4 +1,4 @@
-# In this statistical test, we test the output of the statistical tests.
+# In this code test, we test the output of the statistical tests.
 # As a reference, the two packages ComparisonSurv and bpcp are used.
 # The test statistics...
 # ... naive.test, logtra.test and clog.test are compared to results from bpcp
@@ -63,7 +63,7 @@ apply_all_tests = function(data=NULL, surv_KM=NULL, se_KM=NULL, t=NULL) {
 }
 # Function to apply all bpcp test statistics to data.
 apply_bpcp_tests = function(data, t) {
-  naive = fixtdiff(
+  naive = bpcp::fixtdiff(
     data$time,
     data$status,
     data$group,
@@ -71,7 +71,7 @@ apply_bpcp_tests = function(data, t) {
     varpooled = FALSE,
     testtime = t
   )
-  logtra = fixtdiff(
+  logtra = bpcp::fixtdiff(
     data$time,
     data$status,
     data$group,
@@ -79,7 +79,7 @@ apply_bpcp_tests = function(data, t) {
     varpooled = FALSE,
     testtime = t
   )
-  clog = fixtdiff(
+  clog = bpcp::fixtdiff(
     data$time,
     data$status,
     data$group,
@@ -103,9 +103,9 @@ results = list(exp_surv = apply_all_tests(exp_surv, t = 1),
 # Calculation of reference results
 sink(nullfile())
 ref_Comp = list( # ComparisonSurv reference
-  exp_surv = Fixpoint.test(exp_surv$time, exp_surv$status, exp_surv$group, t0 =
+  exp_surv = ComparisonSurv::Fixpoint.test(exp_surv$time, exp_surv$status, exp_surv$group, t0 =
                              1),
-  amll = Fixpoint.test(amll$time, amll$status, amll$group, t0 =
+  amll = ComparisonSurv::Fixpoint.test(amll$time, amll$status, amll$group, t0 =
                          20)
 )
 sink()
@@ -116,7 +116,7 @@ ref_bpcp = list( # bpcp reference
 )
 
 # The tests
-test_that(
+testthat::test_that(
   "correct p-values and statistics for two numeric survival rates - data frame",
   {
     expect_equal(ref_Comp$exp_surv$test$pvalue[3:5],
@@ -131,7 +131,7 @@ test_that(
   }
 )
 
-test_that(
+testthat::test_that(
   "correct p-values and statistics for two numeric survival rates - survfit object",
   {
     results_fit = apply_all_tests(data=amll_fit, t = 20)
@@ -146,7 +146,7 @@ test_that(
 
 
 
-test_that(
+testthat::test_that(
   "correct p-values and statistics for two numeric survival rates",
   {
     results_2num=apply_all_tests(data=NULL,surv_KM=surv_KM,se_KM=se_KM)
@@ -159,7 +159,7 @@ test_that(
     expect_equal(ref_bpcp$amll$p.values, results_2num$p.values[1:3])
   })
 
-test_that(
+testthat::test_that(
   "correct p-values and statistics for one-group data frame and one-group numeric survival rate",
   {
     amll %>% filter(group==1) -> amll1
@@ -173,7 +173,7 @@ test_that(
     expect_equal(ref_bpcp$amll$p.values, results_1num$p.values[1:3])
   })
 
-test_that(
+testthat::test_that(
   "correct output of data frame names",
   {
     expect_equal(results$exp_surv$data.names, rep("data", 5))

@@ -1,5 +1,6 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/imbi-heidelberg/fixedtimeanalyzR/workflows/R-CMD-check/badge.svg)](https://github.com/imbi-heidelberg/fixedtimeanalyzR/actions)
+[![Codecov test coverage](https://codecov.io/gh/imbi-heidelberg/fixedtimeanalyzR/branch/main/graph/badge.svg)](https://codecov.io/gh/imbi-heidelberg/fixedtimeanalyzR?branch=main)
 <!-- badges: end -->
   
 # fixedtimeanalyzR
