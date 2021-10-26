@@ -114,10 +114,10 @@ get_surv_KM <- function(data = NULL, surv_KM = NULL, t = NULL){
     return(surv_KM)
   } else{
     stop("Invalid input. There are three possibilities for data input,
-        (1) a data frame data with two groups and null variables surv_KM and
-        se_KM, (2) a data frame with one group and numeric vectors surv_KM and
-        se_KM of length 1, (3) a null variable data and numeric vectors surv_KM
-        and se_KM of length 2.")
+        (1) a data frame or a survfit object 'data' with two groups and null variables 'surv_KM' and
+        'se_KM', (2) a data frame or a survfit object 'data' with one group and numeric vectors 'surv_KM' and
+        'se_KM' of length 1, (3) a null variable 'data' and numeric vectors 'surv_KM'
+        and 'se_KM' of length 2.")
   }
 }
 #' Standard error of the Kaplan-Meier survival
@@ -176,10 +176,10 @@ get_se_KM <- function(data = NULL, se_KM = NULL, t = NULL){
     return(se_KM)
   } else{
     stop("Invalid input. There are three possibilities for data input,
-        (1) a data frame data with two groups and null variables surv_KM and
-        se_KM, (2) a data frame with one group and numeric vectors surv_KM and
-        se_KM of length 1, (3) a null variable data and numeric vectors surv_KM
-        and se_KM of length 2.")
+        (1) a data frame or a survfit object 'data' with two groups and null variables 'surv_KM' and
+        'se_KM', (2) a data frame or a survfit object 'data' with one group and numeric vectors 'surv_KM' and
+        'se_KM' of length 1, (3) a null variable 'data' and numeric vectors 'surv_KM'
+        and 'se_KM' of length 2.")
   }
 }
 

@@ -147,15 +147,18 @@ naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #'
 #' @export
 logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Save data name
+  res <- list()
+  res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
   data = get_survfit(data)
+
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
 
-
   # Construction of the htest results object
-  res <- list()
+
   class(res) <- "htest"
   res$null.value  <- c(0)
   names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
@@ -165,7 +168,7 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   This test is using the log-transformed test statistic X2^2 from Klein et al.'s paper
   'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
   26 (2007). It is a chi-squared test with one degree of freedom."
-  res$data.name   <- sprintf(deparse(substitute(data)))
+
   if(!is.null(t)){
     res$parameters  <- c(t)
     names(res$parameters) <- c("time")
@@ -186,7 +189,7 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   res$statistic <- statistic
   names(res$statistic) <- "log-transformed statistic X2^2"
 
-  # p-value, probability of log.t < t
+  # p-value, probability of logtra.t < t
   res$p.value <- 1 - stats::pchisq(statistic, df = 1)
   return(res)
 }
@@ -249,7 +252,6 @@ clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 
 
   # Construction of the htest results object
-  res <- list()
   class(res) <- "htest"
   res$null.value  <- c(0)
   names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
@@ -331,6 +333,9 @@ clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #'
 #' @export
 asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Save data name
+  res <- list()
+  res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
   data = get_survfit(data)
   # Calculation and/or concatenation of survival data
@@ -339,7 +344,6 @@ asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 
 
   # Construction of the htest results object
-  res <- list()
   class(res) <- "htest"
   res$null.value  <- c(0)
   names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
@@ -349,7 +353,6 @@ asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   This test is test statistic X4^2 transformed using arc-sine and square-root
   from Klein et al.'s paper 'Analyzing survival curves at a fixed point in time',
   published in Stat. Med., 26 (2007). It is a chi-squared test with one degree of freedom."
-  res$data.name   <- sprintf(deparse(substitute(data)))
   if(!is.null(t)){
     res$parameters  <- c(t)
     names(res$parameters) <- c("time")
@@ -421,6 +424,9 @@ asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #'
 #' @export
 logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+  # Save data name
+  res <- list()
+  res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
   data = get_survfit(data)
   # Calculation and/or concatenation of survival data
@@ -429,7 +435,6 @@ logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 
 
   # Construction of the htest results object
-  res <- list()
   class(res) <- "htest"
   res$null.value  <- c(0)
   names(res$null.value) <- c("absolute survival rate difference |group 1 - group 2|")
@@ -439,7 +444,6 @@ logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
   This test is using the logit-transformed test statistic X5^2 from Klein et al.'s paper
   'Analyzing survival curves at a fixed point in time', published in Stat. Med.,
   26 (2007). It is a chi-squared test with one degree of freedom."
-  res$data.name   <- sprintf(deparse(substitute(data)))
   if(!is.null(t)){
     res$parameters  <- c(t)
     names(res$parameters) <- c("time")
