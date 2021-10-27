@@ -222,14 +222,18 @@ get_sigma_KM <- function(surv_KM, se_KM){
 #' get_survfit(exp_surv)
 #'
 #' @export
-get_survfit <- function(data){
+get_survfit <- function(data, group = NULL, time=NULL, status=NULL){
+  # Better idea: Set time = time, status = status, group= group as a standard, then everything gets easier :-)
   # If data is of type survfit or null, don't change anything.
   if(methods::is(data, "survfit") | is.null(data)){
     return(data)
   }
-  # Check whether data has variables time and status
-  if(!("time" %in% names(data) && "status" %in% names(data))) {
-    stop("Data set must contain the variables time and status.")
+  # Check whether variables time and status have been specified
+  time_exists = "time" %in% names(data)
+  status_exists = "status" %in% names(data)
+  if(!(time_exists && status_exists)) {
+    stop("Data set must either contain the variables time and status,
+         or the corresponding variables must be specified via the time= and group= options.")
   }
   # check for numeric time variable.
   if (!is.numeric(data$time)) {
@@ -239,8 +243,10 @@ get_survfit <- function(data){
   if("group" %in% names(data)){
     return(survival::survfit(formula = survival::Surv(time, status) ~ group, data=data))
   }
-  else{
-    return(survival::survfit(formula = survival::Surv(time, status) ~ 1, data=data))
+  else if(!is.null(group)){
+    return(survival::survfit(formula = survival::Surv(time, status) ~ group, data=data))
+  } else{
+    return(survival::survfit(formula = survival::Surv(time, status) ~ group, data=data))
   }
 }
 
