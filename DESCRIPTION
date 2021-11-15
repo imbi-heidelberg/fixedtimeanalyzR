@@ -16,7 +16,8 @@ Depends:
 Imports:
     stats,
     survival,
-    methods
+    methods,
+    rlang
 Suggests:
     ggplot2,
     ggfortify,

@@ -92,6 +92,12 @@ apply_bpcp_tests = function(data, t) {
   return(list(p.values = p.values))
 
 }
+# Wrapper function to apply ComparisonSurv tests to data.
+apply_ComparisonSurv_tests(data, t){
+  sink(nullfile())
+  return(ComparisonSurv::Fixpoint.test(data$time, data$status, data$group, t0 = t))
+  sink()
+}
 
 # Calculation of results
 amll_summ = summary(amll_fit, times=20)
@@ -101,14 +107,12 @@ results = list(exp_surv = apply_all_tests(exp_surv, t = 1),
                amll = apply_all_tests(amll, t = 20))
 
 # Calculation of reference results
-sink(nullfile())
+#sink(nullfile())
 ref_Comp = list( # ComparisonSurv reference
-  exp_surv = ComparisonSurv::Fixpoint.test(exp_surv$time, exp_surv$status, exp_surv$group, t0 =
-                             1),
-  amll = ComparisonSurv::Fixpoint.test(amll$time, amll$status, amll$group, t0 =
-                         20)
+  exp_surv = apply_ComparisonSurv_tests(data=exp_surv, t=1),
+  amll = apply_ComparisonSurv_tests(data=amll, t=20)
 )
-sink()
+#sink()
 
 ref_bpcp = list( # bpcp reference
   exp_surv = apply_bpcp_tests(data=exp_surv, t=1),
@@ -183,4 +187,45 @@ testthat::test_that(
                           asinsqrt.test(exp_surv, t = 1)$data.name,
                           logit.test(exp_surv, t = 1)$data.name)
     expect_equal(direct_data.names, rep("exp_surv", 5))
+  })
+
+testthat::test_that(
+  "correct output for individually defined variable names for time, group and status",
+  {
+    data = rotterdam
+    t = 1
+    naive = naive.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
+    logtra = logtra.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
+    clog = clog.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
+    asinsqrt = asinsqrt.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
+    logit = logit.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
+    p.values = c(naive$p.value,
+                 logtra$p.value,
+                 clog$p.value,
+                 asinsqrt$p.value,
+                 logit$p.value)
+    statistics = c(
+      naive$statistic,
+      logtra$statistic,
+      clog$statistic,
+      asinsqrt$statistic,
+      logit$statistic
+    )
+    names(p.values) = NULL
+    names(statistics) = NULL
+    results_rttrdm = list(p.values = p.values, statistics = statistics)
+    data %>% rename(group = chemo, status = death, time = dtime) -> data_renamed
+    # ComparisonSurv reference
+    #sink(nullfile())
+    ref_Comp_rttrdm = apply_ComparisonSurv:tests(data=data_renamed, t=t)
+    #sink()
+    # bpcp reference
+    ref_bpcp_rttrdm = apply_bpcp_tests(data=data_renamed, t=1)
+    expect_equal(ref_Comp_rttrdm$test$statistic[3:5],
+                 results_rttrdm$statistics[3:5],
+                 tolerance = 1e-5)
+    expect_equal(ref_Comp_rttrdm$test$pvalue[3:5],
+                 results_rttrdm$p.values[3:5],
+                 tolerance = 1e-5)
+    expect_equal(ref_bpcp_rttrdm$p.values, results_rttrdm$p.values[1:3])
   })

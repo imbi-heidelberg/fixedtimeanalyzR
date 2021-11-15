@@ -49,7 +49,7 @@
 #'
 #' @export
 naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
-                       group = NULL, time=NULL, status=NULL) {
+                      .time= time, .status= status, .group = group) {
   # Save data name
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))

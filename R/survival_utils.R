@@ -222,25 +222,29 @@ get_sigma_KM <- function(surv_KM, se_KM){
 #' get_survfit(exp_surv)
 #'
 #' @export
-get_survfit <- function(data){
+get_survfit <- function(data, time = time, status = status, group = group){
+  time = rlang::ensym(time)
+  status = rlang::ensym(status)
+  group = rlang::ensym(group)
   # If data is of type survfit or null, don't change anything.
   if(methods::is(data, "survfit") | is.null(data)){
     return(data)
   }
   # Check whether data has variables time and status
-  if(!("time" %in% names(data) && "status" %in% names(data))) {
-    stop("Data set must contain the variables time and status.")
-  }
-  # check for numeric time variable.
-  if (!is.numeric(data$time)) {
-    stop("Variable time must be a numeric vector.")
+  if(is.null(time) | is.null(status)) {
+    stop("The optional function arguments time= and status= must not be NULL.")
   }
   # Split by group, in case such a variable exists.
-  if("group" %in% names(data)){
-    return(survival::survfit(formula = survival::Surv(time, status) ~ group, data=data))
+  print(rlang::as_string(group))
+  if(rlang::as_string(group) %in% names(data)){
+    rlang::inject(
+      return(survival::survfit(formula = survival::Surv(!!time, !!status) ~ !!group, data))
+    )
   }
   else{
-    return(survival::survfit(formula = survival::Surv(time, status) ~ 1, data=data))
+    rlang::inject(
+      return(survival::survfit(formula = survival::Surv(!!time, !!status) ~ 1, data))
+    )
   }
 }
 
