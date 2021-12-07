@@ -223,28 +223,58 @@ get_sigma_KM <- function(surv_KM, se_KM){
 #'
 #' @export
 get_survfit <- function(data, time = time, status = status, group = group){
-  time = rlang::ensym(time)
-  status = rlang::ensym(status)
-  group = rlang::ensym(group)
+  time = rlang::enquo(time)
+  if (rlang::quo_is_null(time)) {
+    warning("You supplied time=NULL as an argument. Assuming you meant the
+            default value time=time.")
+    time = rlang::sym("time")
+  } else if (rlang::quo_is_symbol(time)) {
+    time = rlang::get_expr(time)
+  } else {
+    stop(paste("Expected symbol but found time=", class(rlang::get_expr(time))))
+  }
+  status = rlang::enquo(status)
+  if (rlang::quo_is_null(status)) {
+    warning("You supplied status=NULL as an argument. Assuming you meant the
+            default value status=status.")
+    status = rlang::sym("status")
+  } else if (rlang::quo_is_symbol(status)) {
+    status = rlang::get_expr(status)
+  } else {
+    stop(paste("Expected symbol but found status=", class(rlang::get_expr(status))))
+  }
+  group = rlang::enquo(group)
+  if (rlang::quo_is_null(group)) {
+    warning("You supplied group=NULL as an argument. Assuming you meant the
+            default value group=1, i.e. no grouping of survival data.")
+    group = 1
+  } else if (rlang::quo_is_symbol(group)) {
+    group = rlang::get_expr(group)
+  } else if (rlang::get_expr(group) == 1){
+    group = 1
+  } else {
+    stop(paste("Expected symbol or 1 or NULL but found group=", class(rlang::get_expr(status))))
+  }
   # If data is of type survfit or null, don't change anything.
   if(methods::is(data, "survfit") | is.null(data)){
     return(data)
   }
   # Check whether data has variables time and status
-  if(is.null(time) | is.null(status)) {
-    stop("The optional function arguments time= and status= must not be NULL.")
+  if(!(as.character(time) %in% names(data))) {
+    stop("The time variable ",time, " is not in your data set.")
+  }
+  # Check whether data has variables time and status
+  if(!(as.character(status) %in% names(data))) {
+    stop("The status variable ",status, " is not in your data set.")
   }
   # Split by group, in case such a variable exists.
-  print(rlang::as_string(group))
-  if(rlang::as_string(group) %in% names(data)){
+  if(as.character(group) %in% names(data) | group == 1){
     rlang::inject(
       return(survival::survfit(formula = survival::Surv(!!time, !!status) ~ !!group, data))
     )
   }
   else{
-    rlang::inject(
-      return(survival::survfit(formula = survival::Surv(!!time, !!status) ~ 1, data))
-    )
+    stop("The group variable ",group, " is not in your data set.")
   }
 }
 

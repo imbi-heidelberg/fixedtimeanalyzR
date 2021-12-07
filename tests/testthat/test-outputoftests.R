@@ -93,7 +93,7 @@ apply_bpcp_tests = function(data, t) {
 
 }
 # Wrapper function to apply ComparisonSurv tests to data.
-apply_ComparisonSurv_tests(data, t){
+apply_ComparisonSurv_tests = function(data, t){
   sink(nullfile())
   return(ComparisonSurv::Fixpoint.test(data$time, data$status, data$group, t0 = t))
   sink()
