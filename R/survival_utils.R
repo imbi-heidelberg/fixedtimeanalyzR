@@ -269,8 +269,10 @@ get_survfit <- function(data, time = time, status = status, group = group){
   }
   # Split by group, in case such a variable exists.
   if(as.character(group) %in% names(data) | group == 1){
+    return(
     rlang::inject(
-      return(survival::survfit(formula = survival::Surv(!!time, !!status) ~ !!group, data))
+      survival::survfit(formula = survival::Surv(!!time, !!status) ~ !!group, data)
+    )
     )
   }
   else{
