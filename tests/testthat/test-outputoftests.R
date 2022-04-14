@@ -18,7 +18,7 @@ library(ComparisonSurv)
 library(bpcp)
 library(survival)
 
-# Preparations of data franes
+# Preparations of data frames
 data(exp_surv)
 data(cancer, package = "survival")
 exp_surv %>% mutate(group = group - 1) -> exp_surv # ComparisonSurv only accepts 0 and 1 as group variables
@@ -94,9 +94,9 @@ apply_bpcp_tests = function(data, t) {
 }
 # Wrapper function to apply ComparisonSurv tests to data.
 apply_ComparisonSurv_tests = function(data, t){
-  sink(nullfile())
+  #sink(nullfile())
   return(ComparisonSurv::Fixpoint.test(data$time, data$status, data$group, t0 = t))
-  sink()
+  #sink()
 }
 
 # Calculation of results
@@ -194,11 +194,11 @@ testthat::test_that(
   {
     data = rotterdam
     t = 1
-    naive = naive.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
-    logtra = logtra.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
-    clog = clog.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
-    asinsqrt = asinsqrt.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
-    logit = logit.test(data, surv_KM, se_KM, t = t, time = dtime, group = chemo, status = death)
+    naive = naive.test(data, t = t, time = dtime, group = chemo, status = death)
+    logtra = logtra.test(data, t = t, time = dtime, group = chemo, status = death)
+    clog = clog.test(data, t = t, time = dtime, group = chemo, status = death)
+    asinsqrt = asinsqrt.test(data, t = t, time = dtime, group = chemo, status = death)
+    logit = logit.test(data, t = t, time = dtime, group = chemo, status = death)
     p.values = c(naive$p.value,
                  logtra$p.value,
                  clog$p.value,
@@ -217,7 +217,7 @@ testthat::test_that(
     data %>% rename(group = chemo, status = death, time = dtime) -> data_renamed
     # ComparisonSurv reference
     #sink(nullfile())
-    ref_Comp_rttrdm = apply_ComparisonSurv:tests(data=data_renamed, t=t)
+    ref_Comp_rttrdm = apply_ComparisonSurv_tests(data=data_renamed, t=t)
     #sink()
     # bpcp reference
     ref_bpcp_rttrdm = apply_bpcp_tests(data=data_renamed, t=1)

@@ -21,10 +21,10 @@
 #' get_surv_KM_from_data(exp_surv, 1)
 #'
 #' @export
-get_surv_KM_from_data <- function(data, t){
+get_surv_KM_from_data <- function(data, t, ...){
   # TODO: Ist das überhaupt in Ordnung, dass ich hier extend = TRUE gewählt habe?
   if(!methods::is(data, "survfit")){
-    data_survfit <- get_survfit(data)
+    data_survfit <- get_survfit(data, ...)
     return(summary(data_survfit, times=t, extend = TRUE)$surv)
   }
   return(summary(data, times=t, extend = TRUE)$surv)
@@ -92,7 +92,7 @@ get_se_KM_from_data <- function(data, t){
 #' get_surv_KM(surv_KM=c(0.5,0.6))
 #'
 #' @export
-get_surv_KM <- function(data = NULL, surv_KM = NULL, t = NULL){
+get_surv_KM <- function(data = NULL, surv_KM = NULL, t = NULL, ...){
   n_groups = 0
   if(methods::is(data, "data.frame")){
     n_groups = length(levels(as.factor(data$group)))
@@ -101,11 +101,11 @@ get_surv_KM <- function(data = NULL, surv_KM = NULL, t = NULL){
     n_groups = length(data$n)
   }
   if(!is.null(data) & is.null(surv_KM) & n_groups == 2){
-    return(get_surv_KM_from_data(data, t))
+    return(get_surv_KM_from_data(data, t, ...))
   }
   else if(length(surv_KM) == 1 & (n_groups == 1 | n_groups == 0) & is.numeric(surv_KM)){
     if(n_groups == 0){warning("No group variable was detected in the data frame. Assuming that there is only one group.")}
-    return(c(get_surv_KM_from_data(data,t), surv_KM))
+    return(c(get_surv_KM_from_data(data,t), surv_KM, ...))
   } else if(length(surv_KM) == 2 & is.null(data) & is.numeric(surv_KM)){
     if(!is.null(t)){
       warning("If you want to compare two numeric values of survival
@@ -154,7 +154,7 @@ get_surv_KM <- function(data = NULL, surv_KM = NULL, t = NULL){
 #' get_se_KM(se_KM=c(0.11,0.12))
 #'
 #' @export
-get_se_KM <- function(data = NULL, se_KM = NULL, t = NULL){
+get_se_KM <- function(data = NULL, se_KM = NULL, t = NULL, ...){
   n_groups = 0
   if(methods::is(data, "data.frame")){
     n_groups = length(levels(as.factor(data$group)))
@@ -163,11 +163,11 @@ get_se_KM <- function(data = NULL, se_KM = NULL, t = NULL){
     n_groups = length(data$n)
   }
   if(!is.null(data) & is.null(se_KM) & n_groups == 2){
-    return(get_se_KM_from_data(data, t))
+    return(get_se_KM_from_data(data, t, ...))
   }
   else if(length(se_KM) == 1 & (n_groups == 1| n_groups == 0) & is.numeric(se_KM)){
     if(n_groups == 0){warning("No group variable was detected in the data frame. Assuming that there is only one group.")}
-    return(c(get_se_KM_from_data(data,t), se_KM))
+    return(c(get_se_KM_from_data(data, t, ...), se_KM))
   } else if(length(se_KM) == 2 & is.null(data) & is.numeric(se_KM)){
     if(!is.null(t)){
       warning("If you want to compare two numeric values of survival
@@ -258,17 +258,21 @@ get_survfit <- function(data, time = time, status = status, group = group){
   }
 
   # If data is of type survfit or null, don't change anything.
+
   if(methods::is(data, "survfit") | is.null(data)){
     return(data)
   }
 
   # Check whether data has variables time and status
-  if(!(as.character(time) %in% names(data))) {
-    stop("The time variable ",time, " is not in your data set.")
+  time_name = rlang::inject(deparse(substitute(!!time)))
+  print(paste("Time name =",time_name))
+  if(!(as.character(time_name) %in% names(data))) {
+    stop("The time variable ", time_name, " is not in your data set.")
   }
   # Check whether data has variables time and status
-  if(!(as.character(status) %in% names(data))) {
-    stop("The status variable ",status, " is not in your data set.")
+  status_name = rlang::inject(deparse(substitute(!!status)))
+  if(!(as.character(status_name) %in% names(data))) {
+    stop("The status variable ", status_name, " is not in your data set.")
   }
   # Split by group, in case such a variable exists.
   if(as.character(group) %in% names(data) | group == 1){
@@ -279,7 +283,7 @@ get_survfit <- function(data, time = time, status = status, group = group){
     )
   }
   else{
-    stop("The group variable ",group, " is not in your data set.")
+    stop("The group variable ", group, " is not in your data set.")
   }
 }
 

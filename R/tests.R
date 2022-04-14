@@ -57,7 +57,7 @@ naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data, time, status, group)
+  data = rlang::inject(get_survfit(data, !!time, !!status, !!group))
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -159,7 +159,7 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data, time, status, group)
+  data = rlang::inject(get_survfit(data, !!time, !!status, !!group))
 
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
@@ -257,7 +257,7 @@ clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data, time, status, group)
+  data = rlang::inject(get_survfit(data, !!time, !!status, !!group))
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -353,7 +353,7 @@ asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data, time, status, group)
+  data = rlang::inject(get_survfit(data, !!time, !!status, !!group))
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -448,7 +448,7 @@ logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data, time, status, group)
+  data = rlang::inject(get_survfit(data, !!time, !!status, !!group))
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
