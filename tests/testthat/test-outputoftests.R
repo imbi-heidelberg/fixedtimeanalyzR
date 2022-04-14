@@ -94,9 +94,9 @@ apply_bpcp_tests = function(data, t) {
 }
 # Wrapper function to apply ComparisonSurv tests to data.
 apply_ComparisonSurv_tests = function(data, t){
-  #sink(nullfile())
+  sink(nullfile())
   return(ComparisonSurv::Fixpoint.test(data$time, data$status, data$group, t0 = t))
-  #sink()
+  sink()
 }
 
 # Calculation of results
@@ -229,3 +229,5 @@ testthat::test_that(
                  tolerance = 1e-5)
     expect_equal(ref_bpcp_rttrdm$p.values, results_rttrdm$p.values[1:3])
   })
+
+# THE BIZARRE OUTPUT PROBLEM THAT I AM HAVING HAS SOMETHING TO DO WITH THE SINK-FUNCTION.
