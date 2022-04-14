@@ -49,12 +49,15 @@
 #'
 #' @export
 naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
-                       group = NULL, time=NULL, status=NULL) {
+                      time= time, status= status, group = group) {
+  time = rlang::enquo(time)
+  status = rlang::enquo(status)
+  group = rlang::enquo(group)
   # Save data name
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data, group, time, status)
+  data = get_survfit(data, time, status, group)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -147,12 +150,16 @@ naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
 #' logtra.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
 #'
 #' @export
-logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
+                        time= time, status= status, group = group) {
+  time = rlang::enquo(time)
+  status = rlang::enquo(status)
+  group = rlang::enquo(group)
   # Save data name
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data)
+  data = get_survfit(data, time, status, group)
 
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
@@ -241,12 +248,16 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #' clog.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
 #'
 #' @export
-clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
+                      time= time, status= status, group = group) {
+  time = rlang::enquo(time)
+  status = rlang::enquo(status)
+  group = rlang::enquo(group)
   # Save data name
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data)
+  data = get_survfit(data, time, status, group)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -333,12 +344,16 @@ clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #' asinsqrt.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
 #'
 #' @export
-asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
+                          time= time, status= status, group = group) {
+  time = rlang::enquo(time)
+  status = rlang::enquo(status)
+  group = rlang::enquo(group)
   # Save data name
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data)
+  data = get_survfit(data, time, status, group)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
@@ -424,12 +439,16 @@ asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
 #' logit.test(surv_KM=c(0.5, 0.6), se_KM=c(0.1,0.1))
 #'
 #' @export
-logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL) {
+logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
+                       time= time, status= status, group = group) {
+  time = rlang::enquo(time)
+  status = rlang::enquo(status)
+  group = rlang::enquo(group)
   # Save data name
   res <- list()
   res$data.name   <- sprintf(deparse(substitute(data)))
   # Convert data to survfit object - nothing happens when data is already survfit
-  data = get_survfit(data)
+  data = get_survfit(data, time, status, group)
   # Calculation and/or concatenation of survival data
   surv_KM = get_surv_KM(data, surv_KM, t)
   se_KM = get_se_KM(data, se_KM, t)
