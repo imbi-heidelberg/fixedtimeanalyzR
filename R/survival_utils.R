@@ -223,7 +223,7 @@ get_sigma_KM <- function(surv_KM, se_KM){
 #'
 #' @export
 
-get_survfit <- function(data, time = time, status = status, group = group){
+get_survfit <- function(data, time = time, status = status, group = 1){
   time = rlang::enquo(time)
   if (rlang::quo_is_null(time)) {
     warning("You supplied time=NULL as an argument. Assuming you meant the
@@ -265,7 +265,6 @@ get_survfit <- function(data, time = time, status = status, group = group){
 
   # Check whether data has variables time and status
   time_name = rlang::inject(deparse(substitute(!!time)))
-  print(paste("Time name =",time_name))
   if(!(as.character(time_name) %in% names(data))) {
     stop("The time variable ", time_name, " is not in your data set.")
   }

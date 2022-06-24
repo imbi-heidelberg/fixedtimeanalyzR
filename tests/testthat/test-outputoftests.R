@@ -94,9 +94,10 @@ apply_bpcp_tests = function(data, t) {
 }
 # Wrapper function to apply ComparisonSurv tests to data.
 apply_ComparisonSurv_tests = function(data, t){
-  sink(nullfile())
-  return(ComparisonSurv::Fixpoint.test(data$time, data$status, data$group, t0 = t))
+  sink(nullfile(), type="output")
+  res = ComparisonSurv::Fixpoint.test(data$time, data$status, data$group, t0 = t)
   sink()
+  return(res)
 }
 
 # Calculation of results
@@ -107,12 +108,10 @@ results = list(exp_surv = apply_all_tests(exp_surv, t = 1),
                amll = apply_all_tests(amll, t = 20))
 
 # Calculation of reference results
-#sink(nullfile())
 ref_Comp = list( # ComparisonSurv reference
   exp_surv = apply_ComparisonSurv_tests(data=exp_surv, t=1),
   amll = apply_ComparisonSurv_tests(data=amll, t=20)
 )
-#sink()
 
 ref_bpcp = list( # bpcp reference
   exp_surv = apply_bpcp_tests(data=exp_surv, t=1),
@@ -193,7 +192,7 @@ testthat::test_that(
   "correct output for individually defined variable names for time, group and status",
   {
     data = rotterdam
-    t = 1
+    t = 3000
     naive = naive.test(data, t = t, time = dtime, group = chemo, status = death)
     logtra = logtra.test(data, t = t, time = dtime, group = chemo, status = death)
     clog = clog.test(data, t = t, time = dtime, group = chemo, status = death)
@@ -216,11 +215,9 @@ testthat::test_that(
     results_rttrdm = list(p.values = p.values, statistics = statistics)
     data %>% rename(group = chemo, status = death, time = dtime) -> data_renamed
     # ComparisonSurv reference
-    #sink(nullfile())
     ref_Comp_rttrdm = apply_ComparisonSurv_tests(data=data_renamed, t=t)
-    #sink()
     # bpcp reference
-    ref_bpcp_rttrdm = apply_bpcp_tests(data=data_renamed, t=1)
+    ref_bpcp_rttrdm = apply_bpcp_tests(data=data_renamed, t=t)
     expect_equal(ref_Comp_rttrdm$test$statistic[3:5],
                  results_rttrdm$statistics[3:5],
                  tolerance = 1e-5)
@@ -229,5 +226,3 @@ testthat::test_that(
                  tolerance = 1e-5)
     expect_equal(ref_bpcp_rttrdm$p.values, results_rttrdm$p.values[1:3])
   })
-
-# THE BIZARRE OUTPUT PROBLEM THAT I AM HAVING HAS SOMETHING TO DO WITH THE SINK-FUNCTION.

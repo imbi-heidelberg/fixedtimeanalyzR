@@ -49,7 +49,7 @@
 #'
 #' @export
 naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
-                      time= time, status= status, group = group) {
+                      time= time, status= status, group = 1) {
   time = rlang::enquo(time)
   status = rlang::enquo(status)
   group = rlang::enquo(group)
@@ -151,7 +151,7 @@ naive.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
 #'
 #' @export
 logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
-                        time= time, status= status, group = group) {
+                        time= time, status= status, group = 1) {
   time = rlang::enquo(time)
   status = rlang::enquo(status)
   group = rlang::enquo(group)
@@ -249,7 +249,7 @@ logtra.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
 #'
 #' @export
 clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
-                      time= time, status= status, group = group) {
+                      time= time, status= status, group = 1) {
   time = rlang::enquo(time)
   status = rlang::enquo(status)
   group = rlang::enquo(group)
@@ -345,7 +345,7 @@ clog.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
 #'
 #' @export
 asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
-                          time= time, status= status, group = group) {
+                          time= time, status= status, group = 1) {
   time = rlang::enquo(time)
   status = rlang::enquo(status)
   group = rlang::enquo(group)
@@ -440,7 +440,7 @@ asinsqrt.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
 #'
 #' @export
 logit.test <- function(data = NULL, surv_KM = NULL, se_KM = NULL, t = NULL,
-                       time= time, status= status, group = group) {
+                       time= time, status= status, group = 1) {
   time = rlang::enquo(time)
   status = rlang::enquo(status)
   group = rlang::enquo(group)
